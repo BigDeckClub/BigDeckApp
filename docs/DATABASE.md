@@ -27,42 +27,63 @@
 │ parent_location  │     │ quantity         │      │          │
 │ created_at       │     │ condition        │      │          │
 │ updated_at       │     │ language         │      │          │
-└──────────────────┘     │ foil             │      │          │
-                         │ finish           │      │          │
-┌──────────────────┐     │ frame_effects    │      │          │
-│      cards       │     │ signed           │      │          │
-├──────────────────┤     │ altered          │      │          │
-│ id (PK)          │◄────┤ purchase_price   │      │          │
-│ scryfall_id      │     │ purchase_source  │      │          │
-│ oracle_id        │     │ purchase_date    │      │          │
-│ name             │     │ notes            │      │          │
-│ set_code         │     │ created_at       │      │          │
-│ collector_number │     │ updated_at       │      │          │
-│ rarity           │     └──────────────────┘      │          │
-│ card_type        │                               │          │
-│ mana_cost        │     ┌──────────────────┐      │          │
-│ cmc              │     │   transactions   │      │          │
-│ colors           │     ├──────────────────┤      │          │
-│ image_uris       │     │ id (PK)          │      │          │
-│ prices           │     │ inventory_item_id│──────┘          │
-│ scryfall_uri     │     │ user_id (FK)     │                 │
-│ last_synced_at   │     │ transaction_type │                 │
-│ created_at       │     │ quantity_change  │                 │
-└──────────────────┘     │ quantity_before  │                 │
-                         │ quantity_after   │                 │
-┌──────────────────┐     │ from_location_id │                 │
-│      trades      │     │ to_location_id   │                 │
-├──────────────────┤     │ related_trade_id │                 │
-│ id (PK)          │     │ notes            │                 │
-│ initiator_id(FK) │     │ transaction_date │                 │
-│ recipient_id(FK) │     └──────────────────┘                 │
-│ status           │                                          │
-│ initiated_at     │     ┌──────────────────┐                 │
-│ completed_at     │     │   trade_items    │                 │
-│ notes            │     ├──────────────────┤                 │
-└────────┬─────────┘     │ id (PK)          │                 │
-         │               │ trade_id (FK)    │─────────────────┤
-         └───────────────┤ inventory_item_id│─────────────────┘
+└────────┬─────────┘     │ foil             │      │          │
+         │               │ finish           │      │          │
+         │ 1:N           │ frame_effects    │      │          │
+         │               │ signed           │      │          │
+┌────────▼─────────┐     │ altered          │      │          │
+│ location_shares  │     │ purchase_price   │      │          │
+├──────────────────┤     │ purchase_source  │      │          │
+│ id (PK)          │     │ purchase_date    │      │          │
+│ location_id (FK) │     │ notes            │      │          │
+│ shared_with(FK)  │     │ created_at       │      │          │
+│ permission_level │     │ updated_at       │      │          │
+│ shared_by (FK)   │     └──────────────────┘      │          │
+│ shared_at        │                               │          │
+└──────────────────┘     ┌──────────────────┐      │          │
+                         │      cards       │      │          │
+                         ├──────────────────┤      │          │
+                         │ id (PK)          │◄─────┘          │
+                         │ scryfall_id      │                 │
+                         │ oracle_id        │                 │
+                         │ name             │                 │
+                         │ set_code         │                 │
+                         │ collector_number │                 │
+                         │ rarity           │                 │
+                         │ card_type        │                 │
+                         │ mana_cost        │                 │
+                         │ cmc              │                 │
+                         │ colors           │                 │
+                         │ image_uris       │                 │
+                         │ prices           │                 │
+                         │ scryfall_uri     │                 │
+                         │ last_synced_at   │                 │
+                         │ created_at       │                 │
+                         └──────────────────┘                 │
+                                                              │
+┌──────────────────┐     ┌──────────────────┐                 │
+│      trades      │     │   transactions   │                 │
+├──────────────────┤     ├──────────────────┤                 │
+│ id (PK)          │     │ id (PK)          │                 │
+│ initiator_id(FK) │     │ inventory_item_id│─────────────────┤
+│ recipient_id(FK) │     │ user_id (FK)     │                 │
+│ status           │     │ transaction_type │                 │
+│ initiated_at     │     │ quantity_change  │                 │
+│ completed_at     │     │ quantity_before  │                 │
+│ notes            │     │ quantity_after   │                 │
+└────────┬─────────┘     │ from_location_id │                 │
+         │               │ to_location_id   │                 │
+         │               │ related_trade_id │                 │
+         │               │ notes            │                 │
+         │               │ transaction_date │                 │
+         │               └──────────────────┘                 │
+         │                                                    │
+         │               ┌──────────────────┐                 │
+         │               │   trade_items    │                 │
+         │               ├──────────────────┤                 │
+         │               │ id (PK)          │                 │
+         └───────────────┤ trade_id (FK)    │─────────────────┤
+                         │ inventory_item_id│─────────────────┘
                          │ from_user_id(FK) │
                          │ to_user_id (FK)  │
                          │ quantity         │
@@ -111,6 +132,25 @@ Physical storage locations for cards.
 | parent_location_id | UUID | Parent location (self-reference) |
 | created_at | TIMESTAMP | Creation time |
 | updated_at | TIMESTAMP | Last update time (auto-updated) |
+
+### location_shares
+Enables sharing locations between users for collaborative cubes and shared inventory management.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| location_id | UUID | Location being shared (FK → locations) |
+| shared_with_user_id | UUID | User receiving access (FK → users) |
+| permission_level | VARCHAR(20) | VIEW, EDIT, or ADMIN (default: VIEW) |
+| shared_by_user_id | UUID | User who shared the location (FK → users) |
+| shared_at | TIMESTAMP | When the location was shared |
+
+**Permission Levels:**
+- **VIEW**: User can see cards in the location but cannot modify
+- **EDIT**: User can add/remove cards from the location
+- **ADMIN**: User can share the location with other users (same as owner)
+
+**Note:** The combination of `location_id` and `shared_with_user_id` is unique to prevent duplicate shares.
 
 ### cards
 Card metadata from Scryfall API.
@@ -273,6 +313,42 @@ GROUP BY cat.id, cat.name, cat.minimum_stock_level
 HAVING COALESCE(SUM(i.quantity), 0) < cat.minimum_stock_level;
 ```
 
+### Share a location with another user
+```sql
+INSERT INTO location_shares (location_id, shared_with_user_id, permission_level, shared_by_user_id)
+VALUES ('location-uuid', 'user-to-share-with-uuid', 'EDIT', 'owner-user-uuid');
+```
+
+### Get all locations shared with a user
+```sql
+SELECT l.*, ls.permission_level, u.username as owner_username
+FROM locations l
+JOIN location_shares ls ON l.id = ls.location_id
+JOIN users u ON l.user_id = u.id
+WHERE ls.shared_with_user_id = 'user-uuid';
+```
+
+### Get all users a location is shared with
+```sql
+SELECT u.username, ls.permission_level, ls.shared_at, sharer.username as shared_by
+FROM location_shares ls
+JOIN users u ON ls.shared_with_user_id = u.id
+JOIN users sharer ON ls.shared_by_user_id = sharer.id
+WHERE ls.location_id = 'location-uuid';
+```
+
+### Check if user has access to a location
+```sql
+SELECT 
+  CASE 
+    WHEN l.user_id = 'user-uuid' THEN 'OWNER'
+    ELSE COALESCE(ls.permission_level, 'NONE')
+  END as access_level
+FROM locations l
+LEFT JOIN location_shares ls ON l.id = ls.location_id AND ls.shared_with_user_id = 'user-uuid'
+WHERE l.id = 'location-uuid';
+```
+
 ## Indexes
 
 The following indexes are created for query performance:
@@ -295,6 +371,9 @@ The following indexes are created for query performance:
 | trades | idx_trades_initiator | initiator_user_id |
 | trades | idx_trades_recipient | recipient_user_id |
 | trades | idx_trades_status | status |
+| location_shares | idx_location_shares_location | location_id |
+| location_shares | idx_location_shares_user | shared_with_user_id |
+| location_shares | idx_location_shares_shared_by | shared_by_user_id |
 
 ## Triggers
 

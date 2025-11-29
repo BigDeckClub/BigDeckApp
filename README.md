@@ -7,6 +7,7 @@ A Magic: The Gathering card inventory tracking application built with PostgreSQL
 - **Card Management**: Track your MTG card collection with detailed metadata from Scryfall
 - **Variant Tracking**: Separate tracking for foil/non-foil, conditions, and special finishes
 - **Location Management**: Organize cards by physical locations (binders, boxes, decks)
+- **📦 Shared Locations**: Collaborate on cubes and share inventory with other users
 - **Category System**: Categorize cards (Lands, Common, Uncommon, Rare, Mythic, etc.)
 - **Transaction History**: Complete audit trail of all inventory changes
 - **Trade System**: Built-in support for tracking trades between users

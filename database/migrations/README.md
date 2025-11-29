@@ -62,6 +62,7 @@ ON CONFLICT (migration_name) DO NOTHING;
 | Version | Description | Status |
 |---------|-------------|--------|
 | 001 | Initial schema with all core tables | ✅ |
+| 002 | Add location sharing feature | ✅ |
 
 ## Rollback Strategy
 

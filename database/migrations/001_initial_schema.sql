@@ -44,6 +44,26 @@ CREATE TABLE IF NOT EXISTS locations (
 );
 
 -- =====================================================
+-- LOCATION_SHARES TABLE
+-- =====================================================
+CREATE TABLE IF NOT EXISTS location_shares (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  location_id UUID REFERENCES locations(id) ON DELETE CASCADE NOT NULL,
+  shared_with_user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  permission_level VARCHAR(20) NOT NULL DEFAULT 'VIEW' CHECK (permission_level IN ('VIEW', 'EDIT', 'ADMIN')),
+  shared_by_user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  shared_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(location_id, shared_with_user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_location_shares_location ON location_shares(location_id);
+CREATE INDEX IF NOT EXISTS idx_location_shares_user ON location_shares(shared_with_user_id);
+CREATE INDEX IF NOT EXISTS idx_location_shares_shared_by ON location_shares(shared_by_user_id);
+
+COMMENT ON TABLE location_shares IS 'Enables sharing locations between users for collaborative cubes and shared inventory management';
+COMMENT ON COLUMN location_shares.permission_level IS 'Permission levels: VIEW (read-only), EDIT (add/remove cards), ADMIN (can share with others)';
+
+-- =====================================================
 -- CARDS TABLE
 -- =====================================================
 CREATE TABLE IF NOT EXISTS cards (

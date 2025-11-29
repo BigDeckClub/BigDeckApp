@@ -342,7 +342,7 @@ WHERE ls.location_id = 'location-uuid';
 SELECT 
   CASE 
     WHEN l.user_id = 'user-uuid' THEN 'OWNER'
-    ELSE ls.permission_level
+    ELSE COALESCE(ls.permission_level, 'NONE')
   END as access_level
 FROM locations l
 LEFT JOIN location_shares ls ON l.id = ls.location_id AND ls.shared_with_user_id = 'user-uuid'

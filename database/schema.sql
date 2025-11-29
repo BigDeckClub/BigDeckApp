@@ -50,7 +50,7 @@ CREATE TABLE location_shares (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   location_id UUID REFERENCES locations(id) ON DELETE CASCADE NOT NULL,
   shared_with_user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-  permission_level VARCHAR(20) NOT NULL DEFAULT 'VIEW',
+  permission_level VARCHAR(20) NOT NULL DEFAULT 'VIEW' CHECK (permission_level IN ('VIEW', 'EDIT', 'ADMIN')),
   shared_by_user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
   shared_at TIMESTAMP DEFAULT NOW(),
   UNIQUE(location_id, shared_with_user_id)

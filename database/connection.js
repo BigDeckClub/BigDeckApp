@@ -123,10 +123,15 @@ pool.on('connect', (client) => {
   logger.info('Database connection established');
 
   // Set statement timeout on new connections
+  // Note: SET statement_timeout requires a literal value, not a parameter
+  // config.statement_timeout is validated by parseIntEnv to be a safe integer
   if (config.statement_timeout > 0) {
-    client.query(`SET statement_timeout = ${config.statement_timeout}`).catch((err) => {
-      logger.warn('Failed to set statement timeout', { error: err.message });
-    });
+    const timeoutMs = Math.floor(Number(config.statement_timeout));
+    if (Number.isFinite(timeoutMs) && timeoutMs > 0) {
+      client.query(`SET statement_timeout = ${timeoutMs}`).catch((err) => {
+        logger.warn('Failed to set statement timeout', { error: err.message });
+      });
+    }
   }
 });
 

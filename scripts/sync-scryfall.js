@@ -440,7 +440,7 @@ async function importCardsBySearch(query) {
       printProgress(`${progressBar(i + 1, cards.length)} ${cardData.name}`);
     } catch (error) {
       failed++;
-      db.logger.error(`Failed to import ${cardData.name}`, { error: error.message });
+      console.error(`Failed to import ${cardData.name}: ${error.message}`);
     }
   }
 

@@ -26,14 +26,6 @@ const ROLLBACK_DIR = path.join(__dirname, '..', 'database', 'rollbacks');
 // =============================================================================
 
 /**
- * Create a formatted timestamp string
- * @returns {string} Formatted timestamp
- */
-function getTimestamp() {
-  return new Date().toISOString();
-}
-
-/**
  * Format duration in milliseconds to human readable string
  * @param {number} ms - Duration in milliseconds
  * @returns {string} Formatted duration

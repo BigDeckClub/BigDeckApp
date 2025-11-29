@@ -8,6 +8,7 @@
  */
 
 const express = require('express');
+const crypto = require('crypto');
 const db = require('./database/connection');
 
 require('dotenv').config();
@@ -70,7 +71,7 @@ app.use((req, res, next) => {
 
   if (shouldLog) {
     const start = Date.now();
-    const requestId = Math.random().toString(36).substring(7);
+    const requestId = crypto.randomBytes(4).toString('hex');
 
     // Log request start
     db.logger.info(`[${requestId}] ${req.method} ${req.path}`, {

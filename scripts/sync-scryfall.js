@@ -2,6 +2,8 @@
 /**
  * BigDeckApp Scryfall Sync Utility
  * Fetches and caches card data from the Scryfall API
+ * 
+ * Note: Requires Node.js 18+ for native fetch API
  */
 
 const db = require('../database/connection');
@@ -122,13 +124,16 @@ async function upsertCard(cardData) {
  * @returns {Promise<number>} Number of cards synced
  */
 async function syncStaleCards(maxAgeHours = 24) {
-  console.log(`Syncing cards older than ${maxAgeHours} hours...`);
+  // Validate and sanitize maxAgeHours to prevent SQL injection
+  const hours = Math.max(1, Math.min(8760, parseInt(maxAgeHours, 10) || 24));
+  console.log(`Syncing cards older than ${hours} hours...`);
   
   const result = await db.query(
     `SELECT scryfall_id FROM cards 
      WHERE last_synced_at IS NULL 
-        OR last_synced_at < NOW() - INTERVAL '${maxAgeHours} hours'
-     LIMIT 100`
+        OR last_synced_at < NOW() - INTERVAL '1 hour' * $1
+     LIMIT 100`,
+    [hours]
   );
 
   let synced = 0;

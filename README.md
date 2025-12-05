@@ -122,6 +122,37 @@ const card = await scryfall.getCard('Atraxa, Praetors\' Voice');
 const curveAnalysis = calculateManaCurve(deckList);
 ```
 
+#### Subpath Imports
+
+You can also import specific modules using subpath exports:
+
+```javascript
+// Import agent directly
+import { DeckBuilderAgent } from 'bigdeck-ai/agent';
+
+// Import tools
+import { createGetCardInfoTool } from 'bigdeck-ai/tools';
+
+// Import system prompt
+import { systemPrompt } from 'bigdeck-ai/prompts';
+
+// Import specific integrations
+import { config } from 'bigdeck-ai/integrations/config';
+import { scryfall } from 'bigdeck-ai/integrations/scryfall';
+import { createGroqLLM } from 'bigdeck-ai/integrations/groq';
+
+// Import specific knowledge modules
+import { commanderRules } from 'bigdeck-ai/knowledge/commanderRules';
+import { archetypes } from 'bigdeck-ai/knowledge/archetypes';
+import { deckStructure } from 'bigdeck-ai/knowledge/deckStructure';
+import { staples } from 'bigdeck-ai/knowledge/staples';
+
+// Import specific utilities
+import { parseColorIdentity } from 'bigdeck-ai/utils/colorIdentity';
+import { calculateManaCurve } from 'bigdeck-ai/utils/curveAnalysis';
+import { generateManaBase } from 'bigdeck-ai/utils/manabase';
+```
+
 #### Integration Examples
 
 **Express API Endpoint:**

@@ -6,14 +6,47 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./index.js",
-      "require": "./index.js"
+      "import": "./index.js"
     },
-    "./agent": "./src/agent/DeckBuilderAgent.js",
-    "./tools": "./src/agent/tools/index.js",
-    "./integrations": "./src/integrations/config.js",
-    "./knowledge": "./src/knowledge/commanderRules.js",
-    "./utils": "./src/utils/colorIdentity.js"
+    "./agent": {
+      "import": "./src/agent/DeckBuilderAgent.js"
+    },
+    "./tools": {
+      "import": "./src/agent/tools/index.js"
+    },
+    "./prompts": {
+      "import": "./src/agent/prompts/systemPrompt.js"
+    },
+    "./integrations/config": {
+      "import": "./src/integrations/config.js"
+    },
+    "./integrations/scryfall": {
+      "import": "./src/integrations/scryfall.js"
+    },
+    "./integrations/groq": {
+      "import": "./src/integrations/groq.js"
+    },
+    "./knowledge/commanderRules": {
+      "import": "./src/knowledge/commanderRules.js"
+    },
+    "./knowledge/archetypes": {
+      "import": "./src/knowledge/archetypes.js"
+    },
+    "./knowledge/deckStructure": {
+      "import": "./src/knowledge/deckStructure.js"
+    },
+    "./knowledge/staples": {
+      "import": "./src/knowledge/staples.js"
+    },
+    "./utils/colorIdentity": {
+      "import": "./src/utils/colorIdentity.js"
+    },
+    "./utils/curveAnalysis": {
+      "import": "./src/utils/curveAnalysis.js"
+    },
+    "./utils/manabase": {
+      "import": "./src/utils/manabase.js"
+    }
   },
   "bin": {
     "bigdeck": "./src/index.js"

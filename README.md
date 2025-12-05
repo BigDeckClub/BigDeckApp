@@ -5,13 +5,17 @@ An AI-powered Magic: The Gathering Commander/EDH deck building agent using LangC
 ## ✨ Features
 
 - **AI-Powered Deck Building**: Leverages advanced LLMs to create optimized Commander decks
+- **RAG-Enhanced Intelligence**: Integrates EDHREC, MTGGoldfish, and Untapped.gg for data-driven recommendations
 - **Commander Format Expertise**: Built-in knowledge of Commander rules, ban list, and deck building theory
+- **EDHREC Synergy Data**: Automatically finds high-synergy cards for any commander
+- **Meta Analysis**: Access current meta statistics, win rates, and popular strategies
+- **Mana Curve Optimization**: Analyzes and optimizes deck curves for consistency
 - **Scryfall Integration**: Access to complete Magic card database via free Scryfall API
 - **Interactive CLI**: User-friendly command-line interface with multiple modes
 - **Archetype Support**: Understands aggro, control, combo, tribal, superfriends, and more
 - **Budget Awareness**: Can build decks within specified budget constraints
-- **Inventory Integration**: (Future) Connect to BigDeckAppV3 to build from your collection
-- **Multiple LLM Providers**: Default Groq (free), with OpenAI/Anthropic/Ollama support
+- **Multiple LLM Providers**: Default Groq (free), with GPT-4o, Claude 3.5, and Ollama support
+- **User Preferences**: Saves deck history, favorite commanders, and play style preferences
 
 ## 🚀 Quick Start
 
@@ -115,9 +119,9 @@ GROQ_API_KEY=your-key-here
 | Provider | Speed | Cost | Setup |
 |----------|-------|------|-------|
 | **Groq** (default) | ⚡ Very Fast (~300 tokens/sec) | 💚 Free | Get key at console.groq.com |
-| OpenAI | 🔵 Fast | 💰 Paid | Requires OpenAI API key |
-| Anthropic | 🔵 Fast | 💰 Paid | Requires Anthropic API key |
-| Ollama | 🟢 Medium | 💚 Free | Requires local Ollama installation |
+| **OpenAI (GPT-4o)** | 🔵 Fast | 💰 Paid | Requires OpenAI API key, best quality |
+| **Anthropic (Claude 3.5)** | 🔵 Fast | 💰 Paid | Requires Anthropic API key, excellent reasoning |
+| **Ollama** | 🟢 Medium | 💚 Free | Requires local Ollama installation |
 
 ## 🏗️ Architecture
 
@@ -128,16 +132,22 @@ BigDeckApp/
 │   ├── agent/
 │   │   ├── DeckBuilderAgent.js  # Core AI agent logic
 │   │   ├── prompts/
-│   │   │   └── systemPrompt.js  # Commander expertise prompt
+│   │   │   └── systemPrompt.js  # Enhanced Commander expertise prompt
 │   │   └── tools/
-│   │       ├── searchInventory.js    # Search user inventory
-│   │       ├── getCardInfo.js        # Fetch from Scryfall
-│   │       ├── validateDeck.js       # Validate legality
-│   │       └── index.js              # Tool exports
+│   │       ├── searchInventory.js      # Search user inventory
+│   │       ├── getCardInfo.js          # Fetch from Scryfall
+│   │       ├── validateDeck.js         # Validate legality
+│   │       ├── getEDHRECSynergies.js   # EDHREC synergy data (NEW!)
+│   │       ├── getMetaAnalysis.js      # Meta statistics (NEW!)
+│   │       ├── analyzeManaCurve.js     # Mana curve analysis (NEW!)
+│   │       └── index.js                # Tool exports
 │   ├── integrations/
 │   │   ├── bigDeckApi.js        # BigDeckAppV3 API client
 │   │   ├── scryfall.js          # Scryfall API wrapper
-│   │   ├── groq.js              # Groq LLM setup
+│   │   ├── edhrec.js            # EDHREC API integration (NEW!)
+│   │   ├── mtggoldfish.js       # MTGGoldfish integration (NEW!)
+│   │   ├── untapped.js          # Untapped.gg integration (NEW!)
+│   │   ├── llm.js               # Multi-provider LLM factory (NEW!)
 │   │   └── config.js            # API configuration
 │   ├── knowledge/
 │   │   ├── commanderRules.js    # Format rules & ban list
@@ -147,10 +157,42 @@ BigDeckApp/
 │   └── utils/
 │       ├── manabase.js          # Mana base calculations
 │       ├── curveAnalysis.js     # CMC curve analysis
-│       └── colorIdentity.js     # Color identity validation
+│       ├── colorIdentity.js     # Color identity validation
+│       └── userPreferences.js   # User prefs & history (NEW!)
 ```
 
 ## 🎯 Features Deep Dive
+
+### RAG-Powered Intelligence
+
+The AI now leverages Retrieval Augmented Generation (RAG) to provide data-driven recommendations:
+
+- **EDHREC Integration**: Access to synergy scores and inclusion rates for any commander
+  - Automatically suggests high-synergy cards based on thousands of real decks
+  - Organizes recommendations by card type (creatures, removal, ramp, etc.)
+  - Provides inclusion percentages to understand popularity
+
+- **Meta Analysis**: Real-time competitive landscape insights
+  - Top commanders and their win rates from Untapped.gg
+  - Popular archetypes and color combinations
+  - Meta-defining cards and their impact on win rate
+  - Power level distribution across the format
+
+- **Mana Curve Optimization**: Ensures deck consistency
+  - Analyzes CMC distribution across the deck
+  - Compares to ideal curves for different strategies
+  - Provides specific recommendations for improvements
+
+### AI Tools Available
+
+When building decks, the AI can autonomously use these tools:
+
+1. **get_edhrec_synergies** - Fetches commander-specific card recommendations
+2. **get_meta_analysis** - Gets current meta statistics and trends
+3. **analyze_mana_curve** - Analyzes deck curve and suggests optimizations
+4. **get_card_info** - Looks up card details from Scryfall
+5. **validate_deck** - Checks format legality and color identity
+6. **search_inventory** - Searches user's collection (when available)
 
 ### Commander Format Knowledge
 
@@ -187,19 +229,26 @@ The agent follows these guidelines:
 
 ## 🔮 Future Roadmap
 
+- [x] **RAG Integration**: EDHREC, MTGGoldfish, Untapped.gg data sources
+- [x] **Advanced AI Tools**: Synergy lookup, meta analysis, curve optimization
+- [x] **Multi-LLM Support**: GPT-4o, Claude 3.5 Sonnet, Ollama
+- [x] **User Preferences**: Deck history and favorite settings
 - [ ] **Web UI**: Browser-based interface
 - [ ] **Discord Bot**: Build decks in Discord servers
 - [ ] **BigDeckAppV3 Integration**: Build decks from your actual collection
 - [ ] **Deck Pricing**: Real-time price data from TCGPlayer/CardKingdom
-- [ ] **Meta Analysis**: Track popular commanders and strategies
 - [ ] **Deck Optimization**: Suggest upgrades for existing decks
 - [ ] **Proxy Generator**: Generate printable proxies
 - [ ] **Deck Testing**: Simulate games and goldfish testing
+- [ ] **Public API**: RESTful API for external integrations
 
 ## 🔗 Related Projects
 
 - **BigDeckAppV3**: Card inventory management system (coming soon)
 - **Scryfall**: [scryfall.com](https://scryfall.com) - Magic card database API
+- **EDHREC**: [edhrec.com](https://edhrec.com) - Commander deck database and recommendations
+- **MTGGoldfish**: [mtggoldfish.com](https://www.mtggoldfish.com) - Meta analysis and pricing
+- **Untapped.gg**: [untapped.gg](https://www.untapped.gg) - Competitive deck analytics
 
 ## 📝 Example Commands
 

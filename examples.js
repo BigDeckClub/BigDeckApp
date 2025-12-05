@@ -14,7 +14,7 @@ async function example1_basicDeckBuilding() {
   
   // Initialize the agent
   const agent = await createDeckBuilderAgent({
-    apiKey: process.env.GROQ_API_KEY, // or pass directly
+    apiKey: process.env.GROQ_API_KEY,
     temperature: 0.7,
     verbose: false
   });
@@ -136,8 +136,6 @@ async function example4_scryfallAPI() {
 
 import {
   commanderRules,
-  archetypes,
-  deckStructure,
   getArchetype,
   getStructureForStrategy
 } from 'bigdeck-ai';
@@ -173,93 +171,138 @@ import { createDeckBuilderAgent } from 'bigdeck-ai';
 const app = express();
 app.use(express.json());
 
-app.post('/api/build-deck', async (req, res) => {
+// Initialize agent once at startup
+let agent;
+
+async function startServer() {
   try {
-    const { commander, strategy, budget, powerLevel } = req.body;
-    
-    const agent = await createDeckBuilderAgent({
+    agent = await createDeckBuilderAgent({
       apiKey: process.env.GROQ_API_KEY
     });
-    
-    let prompt = `Build a Commander deck with ${commander}`;
-    if (strategy) prompt += ` using a ${strategy} strategy`;
-    if (budget) prompt += ` with a budget of $${budget}`;
-    if (powerLevel) prompt += ` at power level ${powerLevel}`;
-    
-    const deck = await agent.buildDeck(prompt);
-    
-    res.json({ success: true, deck });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
+    console.log('Agent initialized');
 
-app.post('/api/chat', async (req, res) => {
-  try {
-    const { message, history = [] } = req.body;
-    
-    const agent = await createDeckBuilderAgent({
-      apiKey: process.env.GROQ_API_KEY
+    app.post('/api/build-deck', async (req, res) => {
+      try {
+        if (!agent) {
+          return res.status(503).json({ success: false, error: 'Agent not ready' });
+        }
+        
+        const { commander, strategy, budget, powerLevel } = req.body;
+        
+        let prompt = `Build a Commander deck with ${commander}`;
+        if (strategy) prompt += ` using a ${strategy} strategy`;
+        if (budget) prompt += ` with a budget of $${budget}`;
+        if (powerLevel) prompt += ` at power level ${powerLevel}`;
+        
+        const deck = await agent.buildDeck(prompt);
+        
+        res.json({ success: true, deck });
+      } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+      }
     });
-    
-    const response = await agent.chat(message, history);
-    
-    res.json({ success: true, response });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
 
-app.listen(3000, () => {
-  console.log('BigDeck AI API server running on port 3000');
-});
+    app.post('/api/chat', async (req, res) => {
+      try {
+        if (!agent) {
+          return res.status(503).json({ success: false, error: 'Agent not ready' });
+        }
+        
+        const { message, history = [] } = req.body;
+        const response = await agent.chat(message, history);
+        
+        res.json({ success: true, response });
+      } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    app.listen(3000, () => {
+      console.log('BigDeck AI API server running on port 3000');
+    });
+  } catch (error) {
+    console.error('Failed to initialize agent:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
 */
 
 // ============================================================================
-// Example 7: React Component
+// Example 7: React Component (Server-Side)
 // ============================================================================
 
-// Uncomment to use with React
-/*
-import { useState, useEffect } from 'react';
-import { createDeckBuilderAgent, scryfall } from 'bigdeck-ai';
+// Note: For production use, call your backend API from React instead of
+// using the API key in the frontend. This example shows a Node.js server
+// that can be used with a React frontend.
 
-function DeckBuilderComponent() {
-  const [agent, setAgent] = useState(null);
+/*
+// Backend server (Node.js/Express)
+import express from 'express';
+import { createDeckBuilderAgent } from 'bigdeck-ai';
+
+const app = express();
+app.use(express.json());
+
+let agent;
+
+async function startServer() {
+  agent = await createDeckBuilderAgent({
+    apiKey: process.env.GROQ_API_KEY
+  });
+  
+  app.post('/api/build-deck', async (req, res) => {
+    if (!agent) {
+      return res.status(503).json({ error: 'Agent not ready' });
+    }
+    
+    const { commander, strategy, budget } = req.body;
+    const prompt = `Build a ${strategy} deck with ${commander} under $${budget}`;
+    const deck = await agent.buildDeck(prompt);
+    
+    res.json({ deck });
+  });
+  
+  app.listen(3000);
+}
+
+startServer();
+
+// Frontend (React)
+import { useState } from 'react';
+
+function DeckBuilder() {
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState([]);
-
-  useEffect(() => {
-    // Initialize agent when component mounts
-    createDeckBuilderAgent({
-      apiKey: import.meta.env.VITE_GROQ_API_KEY
-    }).then(setAgent);
-  }, []);
-
-  const sendMessage = async (message) => {
-    if (!agent) return;
-    
-    setLoading(true);
-    try {
-      const result = await agent.chat(message, history);
-      setResponse(result.output);
-      setHistory(result.history);
-    } catch (error) {
-      console.error('Error:', error);
-      setResponse('Error: ' + error.message);
-    }
-    setLoading(false);
-  };
 
   const buildDeck = async () => {
-    await sendMessage('Build me a budget Krenko goblin tribal deck under $100');
+    setLoading(true);
+    try {
+      const payload = {
+        commander: "Krenko, Mob Boss",
+        strategy: "goblin tribal",
+        budget: 100
+      };
+      
+      const res = await fetch('/api/build-deck', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await res.json();
+      setResponse(data.deck || JSON.stringify(data, null, 2));
+    } catch (error) {
+      setResponse(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div>
-      <h1>BigDeck AI Deck Builder</h1>
-      <button onClick={buildDeck} disabled={!agent || loading}>
+      <button onClick={buildDeck} disabled={loading}>
         {loading ? 'Building...' : 'Build Deck'}
       </button>
       <pre>{response}</pre>
@@ -281,3 +324,4 @@ function DeckBuilderComponent() {
 // example5_knowledgeBase();
 
 console.log('\n✅ Examples loaded. Uncomment the examples you want to run.\n');
+

@@ -73,7 +73,6 @@ import { DeckBuilderAgent, createDeckBuilderAgent } from 'bigdeck-ai';
 
 // Create agent instance
 const agent = await createDeckBuilderAgent({
-  provider: 'groq',
   apiKey: process.env.GROQ_API_KEY,
   temperature: 0.7
 });
@@ -163,42 +162,82 @@ import { createDeckBuilderAgent } from 'bigdeck-ai';
 const app = express();
 app.use(express.json());
 
-app.post('/api/build-deck', async (req, res) => {
-  const { commander, strategy, budget } = req.body;
-  
-  const agent = await createDeckBuilderAgent({
-    apiKey: process.env.GROQ_API_KEY
-  });
-  
-  const prompt = `Build a ${strategy} deck with ${commander} under $${budget}`;
-  const deck = await agent.buildDeck(prompt);
-  
-  res.json({ deck });
-});
+// Initialize agent once at startup
+let agent;
 
-app.listen(3000);
+async function startServer() {
+  try {
+    agent = await createDeckBuilderAgent({
+      apiKey: process.env.GROQ_API_KEY
+    });
+    console.log('Agent initialized');
+
+    app.post('/api/build-deck', async (req, res) => {
+      try {
+        if (!agent) {
+          return res.status(503).json({ error: 'Agent not ready' });
+        }
+        
+        const { commander, strategy, budget } = req.body;
+        const prompt = `Build a ${strategy} deck with ${commander} under $${budget}`;
+        const deck = await agent.buildDeck(prompt);
+        
+        res.json({ deck });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    app.listen(3000, () => {
+      console.log('Server listening on port 3000');
+    });
+  } catch (error) {
+    console.error('Failed to initialize agent:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
 ```
 
 **React Frontend:**
 ```javascript
 import { useState } from 'react';
-import { createDeckBuilderAgent } from 'bigdeck-ai';
 
 function DeckBuilder() {
   const [response, setResponse] = useState('');
+  const [loading, setLoading] = useState(false);
   
   const buildDeck = async () => {
-    const agent = await createDeckBuilderAgent({
-      apiKey: import.meta.env.VITE_GROQ_API_KEY
-    });
-    
-    const result = await agent.chat('Build me a Krenko goblin tribal deck');
-    setResponse(result.output);
+    setLoading(true);
+    try {
+      // Call your backend API instead of using the key in the frontend
+      const payload = {
+        commander: "Krenko, Mob Boss",
+        strategy: "goblin tribal",
+        budget: 100
+      };
+      
+      const res = await fetch('/api/build-deck', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await res.json();
+      setResponse(data.deck || JSON.stringify(data, null, 2));
+    } catch (error) {
+      setResponse(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
   
   return (
     <div>
-      <button onClick={buildDeck}>Build Deck</button>
+      <button onClick={buildDeck} disabled={loading}>
+        {loading ? 'Building...' : 'Build Deck'}
+      </button>
       <pre>{response}</pre>
     </div>
   );

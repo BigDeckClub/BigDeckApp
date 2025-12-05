@@ -11,8 +11,8 @@
  * 
  * // Create and use agent
  * const agent = await createDeckBuilderAgent({ 
- *   provider: 'groq', 
- *   apiKey: process.env.GROQ_API_KEY 
+ *   apiKey: process.env.GROQ_API_KEY,
+ *   temperature: 0.7
  * });
  * const response = await agent.chat('Build me a cEDH Atraxa deck');
  */

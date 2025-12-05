@@ -11,6 +11,7 @@ import inquirer from 'inquirer';
 import dotenv from 'dotenv';
 import { createDeckBuilderAgent } from './agent/DeckBuilderAgent.js';
 import { config, validateConfig } from './integrations/config.js';
+import { getLLMDisplayName } from './integrations/llm.js';
 
 // Load environment variables
 dotenv.config();
@@ -32,7 +33,7 @@ program
   .action(async () => {
     try {
       console.log(chalk.cyan.bold('\n🃏 BigDeck AI - Commander Deck Builder'));
-      console.log(chalk.gray(`Using: ${config.llm.provider} (${config.llm[config.llm.provider].model})\n`));
+      console.log(chalk.gray(`Using: ${getLLMDisplayName()}\n`));
 
       // Validate configuration
       validateConfig();

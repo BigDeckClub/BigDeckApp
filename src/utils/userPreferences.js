@@ -24,8 +24,13 @@ class UserPreferences {
    * Ensure data directory exists
    */
   ensureDataDirectory() {
-    if (!fs.existsSync(this.prefsDir)) {
-      fs.mkdirSync(this.prefsDir, { recursive: true });
+    try {
+      if (!fs.existsSync(this.prefsDir)) {
+        fs.mkdirSync(this.prefsDir, { recursive: true });
+      }
+    } catch (error) {
+      console.warn('Failed to create user data directory:', error.message);
+      // Continue anyway - operations will fail gracefully later
     }
   }
 
@@ -234,7 +239,10 @@ class UserPreferences {
     }
 
     if (this.history.length > 0) {
-      stats.averagePowerLevel = (powerLevelSum / this.history.length).toFixed(1);
+      const powerLevelCount = this.history.filter(d => d.powerLevel).length;
+      if (powerLevelCount > 0) {
+        stats.averagePowerLevel = (powerLevelSum / powerLevelCount).toFixed(1);
+      }
     }
 
     if (budgetCount > 0) {

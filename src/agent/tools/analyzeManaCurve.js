@@ -15,8 +15,12 @@ function analyzeManaCurve(cards) {
   let nonLandCount = 0;
 
   for (const card of cards) {
-    if (card.type && card.type.toLowerCase().includes('land')) {
-      continue; // Skip lands
+    // Skip lands - check for Land in type line
+    if (card.type && (
+      card.type.toLowerCase().includes('land') ||
+      card.type.toLowerCase().startsWith('basic land')
+    )) {
+      continue;
     }
 
     const cmc = card.cmc || 0;

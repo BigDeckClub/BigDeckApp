@@ -68,7 +68,11 @@ class EDHRECAPI {
     await this.waitForRateLimit();
 
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'BigDeckAI/1.0 (Commander Deck Builder)',
+        },
+      });
       
       if (!response.ok) {
         throw new Error(`EDHREC API error: ${response.status} ${response.statusText}`);

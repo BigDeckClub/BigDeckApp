@@ -9,25 +9,25 @@ import { config } from './config.js';
 /**
  * Create an LLM instance based on configured provider
  * @param {Object} options - LLM options (temperature, streaming, etc.)
- * @returns {Object} LLM instance
+ * @returns {Promise<Object>} LLM instance
  */
-export function createLLM(options = {}) {
+export async function createLLM(options = {}) {
   const provider = config.llm.provider;
   const temperature = options.temperature ?? config.llm[provider].temperature;
   const streaming = options.streaming ?? false;
 
   switch (provider) {
     case 'groq':
-      return createGroqLLM({ temperature, streaming });
+      return await createGroqLLM({ temperature, streaming });
     
     case 'openai':
-      return createOpenAILLM({ temperature, streaming });
+      return await createOpenAILLM({ temperature, streaming });
     
     case 'anthropic':
-      return createAnthropicLLM({ temperature, streaming });
+      return await createAnthropicLLM({ temperature, streaming });
     
     case 'ollama':
-      return createOllamaLLM({ temperature, streaming });
+      return await createOllamaLLM({ temperature, streaming });
     
     default:
       throw new Error(`Unsupported LLM provider: ${provider}`);
@@ -37,7 +37,7 @@ export function createLLM(options = {}) {
 /**
  * Create Groq LLM instance (default, free)
  */
-export function createGroqLLM(options = {}) {
+export async function createGroqLLM(options = {}) {
   const { temperature = 0.7, streaming = false } = options;
 
   if (!config.llm.groq.apiKey) {
@@ -55,7 +55,7 @@ export function createGroqLLM(options = {}) {
 /**
  * Create OpenAI LLM instance (GPT-4o, GPT-4, etc.)
  */
-export function createOpenAILLM(options = {}) {
+export async function createOpenAILLM(options = {}) {
   const { temperature = 0.7, streaming = false } = options;
 
   if (!config.llm.openai.apiKey) {
@@ -63,20 +63,19 @@ export function createOpenAILLM(options = {}) {
   }
 
   // Dynamic import to avoid requiring the package if not used
-  return import('@langchain/openai').then(({ ChatOpenAI }) => {
-    return new ChatOpenAI({
-      apiKey: config.llm.openai.apiKey,
-      model: config.llm.openai.model,
-      temperature,
-      streaming,
-    });
+  const { ChatOpenAI } = await import('@langchain/openai');
+  return new ChatOpenAI({
+    apiKey: config.llm.openai.apiKey,
+    model: config.llm.openai.model,
+    temperature,
+    streaming,
   });
 }
 
 /**
  * Create Anthropic LLM instance (Claude 3.5 Sonnet, etc.)
  */
-export function createAnthropicLLM(options = {}) {
+export async function createAnthropicLLM(options = {}) {
   const { temperature = 0.7, streaming = false } = options;
 
   if (!config.llm.anthropic.apiKey) {
@@ -84,30 +83,28 @@ export function createAnthropicLLM(options = {}) {
   }
 
   // Dynamic import to avoid requiring the package if not used
-  return import('@langchain/anthropic').then(({ ChatAnthropic }) => {
-    return new ChatAnthropic({
-      apiKey: config.llm.anthropic.apiKey,
-      model: config.llm.anthropic.model,
-      temperature,
-      streaming,
-    });
+  const { ChatAnthropic } = await import('@langchain/anthropic');
+  return new ChatAnthropic({
+    apiKey: config.llm.anthropic.apiKey,
+    model: config.llm.anthropic.model,
+    temperature,
+    streaming,
   });
 }
 
 /**
  * Create Ollama LLM instance (local, free)
  */
-export function createOllamaLLM(options = {}) {
+export async function createOllamaLLM(options = {}) {
   const { temperature = 0.7, streaming = false } = options;
 
   // Dynamic import to avoid requiring the package if not used
-  return import('@langchain/ollama').then(({ ChatOllama }) => {
-    return new ChatOllama({
-      baseUrl: config.llm.ollama.baseUrl,
-      model: config.llm.ollama.model,
-      temperature,
-      streaming,
-    });
+  const { ChatOllama } = await import('@langchain/ollama');
+  return new ChatOllama({
+    baseUrl: config.llm.ollama.baseUrl,
+    model: config.llm.ollama.model,
+    temperature,
+    streaming,
   });
 }
 

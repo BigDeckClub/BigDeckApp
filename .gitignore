@@ -48,3 +48,6 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# User data (preferences and history)
+.user-data/

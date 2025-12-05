@@ -17,12 +17,12 @@ export const config = {
     },
     openai: {
       apiKey: process.env.OPENAI_API_KEY,
-      model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
+      model: process.env.OPENAI_MODEL || 'gpt-4o',
       temperature: parseFloat(process.env.LLM_TEMPERATURE) || 0.7,
     },
     anthropic: {
       apiKey: process.env.ANTHROPIC_API_KEY,
-      model: process.env.ANTHROPIC_MODEL || 'claude-3-sonnet-20240229',
+      model: process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022',
       temperature: parseFloat(process.env.LLM_TEMPERATURE) || 0.7,
     },
     ollama: {

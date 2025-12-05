@@ -5,12 +5,15 @@
 
 import { AgentExecutor, createReactAgent } from 'langchain/agents';
 import { pull } from 'langchain/hub';
-import { createGroqLLM } from '../integrations/groq.js';
+import { createLLM } from '../integrations/llm.js';
 import systemPrompt from './prompts/systemPrompt.js';
 import {
   createSearchInventoryTool,
   createGetCardInfoTool,
   createValidateDeckTool,
+  createEDHRECSynergyTool,
+  createMetaAnalysisTool,
+  createManaCurveAnalysisTool,
 } from './tools/index.js';
 
 /**
@@ -29,8 +32,8 @@ export class DeckBuilderAgent {
    * Initialize the agent with LLM and tools
    */
   async initialize() {
-    // Create LLM instance (Groq by default)
-    this.llm = createGroqLLM({
+    // Create LLM instance (uses configured provider)
+    this.llm = await createLLM({
       temperature: this.options.temperature || 0.7,
       streaming: this.options.streaming || false,
     });
@@ -40,6 +43,9 @@ export class DeckBuilderAgent {
       createSearchInventoryTool(),
       createGetCardInfoTool(),
       createValidateDeckTool(),
+      createEDHRECSynergyTool(),
+      createMetaAnalysisTool(),
+      createManaCurveAnalysisTool(),
     ];
 
     // Pull the ReAct prompt from LangChain Hub or use default

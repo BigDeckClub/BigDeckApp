@@ -6,6 +6,9 @@
 export { createSearchInventoryTool } from './searchInventory.js';
 export { createGetCardInfoTool } from './getCardInfo.js';
 export { createValidateDeckTool } from './validateDeck.js';
+export { createEDHRECSynergyTool } from './getEDHRECSynergies.js';
+export { createMetaAnalysisTool } from './getMetaAnalysis.js';
+export { createManaCurveAnalysisTool } from './analyzeManaCurve.js';
 
 /**
  * Get all agent tools
@@ -16,11 +19,17 @@ export async function getAllTools() {
   const { createSearchInventoryTool } = await import('./searchInventory.js');
   const { createGetCardInfoTool } = await import('./getCardInfo.js');
   const { createValidateDeckTool } = await import('./validateDeck.js');
+  const { createEDHRECSynergyTool } = await import('./getEDHRECSynergies.js');
+  const { createMetaAnalysisTool } = await import('./getMetaAnalysis.js');
+  const { createManaCurveAnalysisTool } = await import('./analyzeManaCurve.js');
 
   return [
     createSearchInventoryTool(),
     createGetCardInfoTool(),
     createValidateDeckTool(),
+    createEDHRECSynergyTool(),
+    createMetaAnalysisTool(),
+    createManaCurveAnalysisTool(),
   ];
 }
 

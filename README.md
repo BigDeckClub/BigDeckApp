@@ -2,12 +2,15 @@
 
 An AI-powered Magic: The Gathering Commander/EDH deck building agent using LangChain and Groq (free, fast LLM API).
 
+**Now available as an npm module!** Import directly into your frontend or API projects.
+
 ## ✨ Features
 
 - **AI-Powered Deck Building**: Leverages advanced LLMs to create optimized Commander decks
 - **Commander Format Expertise**: Built-in knowledge of Commander rules, ban list, and deck building theory
 - **Scryfall Integration**: Access to complete Magic card database via free Scryfall API
 - **Interactive CLI**: User-friendly command-line interface with multiple modes
+- **NPM Module**: Import and use in frontend apps, API servers, or any JavaScript/Node.js project
 - **Archetype Support**: Understands aggro, control, combo, tribal, superfriends, and more
 - **Budget Awareness**: Can build decks within specified budget constraints
 - **Inventory Integration**: (Future) Connect to BigDeckAppV3 to build from your collection
@@ -22,6 +25,8 @@ An AI-powered Magic: The Gathering Commander/EDH deck building agent using LangC
 
 ### Installation
 
+#### As a CLI Tool
+
 ```bash
 # Clone the repository
 git clone https://github.com/BigDeckClub/BigDeckApp.git
@@ -35,15 +40,141 @@ cp .env.example .env
 # Edit .env and add your GROQ_API_KEY
 ```
 
+#### As an npm Module
+
+```bash
+# Install from GitHub
+npm install github:BigDeckClub/BigDeckApp
+
+# Or add to package.json
+{
+  "dependencies": {
+    "bigdeck-ai": "github:BigDeckClub/BigDeckApp"
+  }
+}
+```
+
 ### Getting a Free Groq API Key
 
 1. Visit [https://console.groq.com](https://console.groq.com)
 2. Sign up for a free account
 3. Navigate to API Keys section
 4. Create a new API key
-5. Copy the key to your `.env` file
+5. Copy the key to your `.env` file or pass it programmatically
 
 ## 📖 Usage
+
+### As an npm Module
+
+Import BigDeck AI into your frontend or backend applications:
+
+```javascript
+import { DeckBuilderAgent, createDeckBuilderAgent } from 'bigdeck-ai';
+
+// Create agent instance
+const agent = await createDeckBuilderAgent({
+  provider: 'groq',
+  apiKey: process.env.GROQ_API_KEY,
+  temperature: 0.7
+});
+
+// Build a deck
+const deckResponse = await agent.buildDeck(
+  'Build a budget cEDH Atraxa superfriends deck under $500'
+);
+console.log(deckResponse);
+
+// Interactive chat
+const { output, history } = await agent.chat(
+  'What are the best card draw options in these colors?',
+  []
+);
+console.log(output);
+```
+
+#### Advanced Module Usage
+
+```javascript
+// Import specific utilities
+import {
+  commanderRules,
+  archetypes,
+  parseColorIdentity,
+  calculateManaCurve,
+  generateManaBase,
+  scryfall,
+  getEssentialStaples
+} from 'bigdeck-ai';
+
+// Check if a card is banned
+const isBanned = commanderRules.bannedCards.includes('Flash');
+
+// Parse color identity
+const colors = parseColorIdentity('WUB'); // ['W', 'U', 'B']
+
+// Get staples for colors
+const staplesWUB = getEssentialStaples('WUB');
+
+// Fetch card data from Scryfall
+const card = await scryfall.getCard('Atraxa, Praetors\' Voice');
+
+// Analyze mana curve
+const curveAnalysis = calculateManaCurve(deckList);
+```
+
+#### Integration Examples
+
+**Express API Endpoint:**
+```javascript
+import express from 'express';
+import { createDeckBuilderAgent } from 'bigdeck-ai';
+
+const app = express();
+app.use(express.json());
+
+app.post('/api/build-deck', async (req, res) => {
+  const { commander, strategy, budget } = req.body;
+  
+  const agent = await createDeckBuilderAgent({
+    apiKey: process.env.GROQ_API_KEY
+  });
+  
+  const prompt = `Build a ${strategy} deck with ${commander} under $${budget}`;
+  const deck = await agent.buildDeck(prompt);
+  
+  res.json({ deck });
+});
+
+app.listen(3000);
+```
+
+**React Frontend:**
+```javascript
+import { useState } from 'react';
+import { createDeckBuilderAgent } from 'bigdeck-ai';
+
+function DeckBuilder() {
+  const [response, setResponse] = useState('');
+  
+  const buildDeck = async () => {
+    const agent = await createDeckBuilderAgent({
+      apiKey: import.meta.env.VITE_GROQ_API_KEY
+    });
+    
+    const result = await agent.chat('Build me a Krenko goblin tribal deck');
+    setResponse(result.output);
+  };
+  
+  return (
+    <div>
+      <button onClick={buildDeck}>Build Deck</button>
+      <pre>{response}</pre>
+    </div>
+  );
+}
+```
+
+### CLI Usage
 
 ### Interactive Chat Mode (Default)
 
@@ -123,6 +254,7 @@ GROQ_API_KEY=your-key-here
 
 ```
 BigDeckApp/
+├── index.js                     # Main module entrypoint (for npm usage)
 ├── src/
 │   ├── index.js                 # Main CLI entry point
 │   ├── agent/
@@ -149,6 +281,55 @@ BigDeckApp/
 │       ├── curveAnalysis.js     # CMC curve analysis
 │       └── colorIdentity.js     # Color identity validation
 ```
+
+## 📦 Module Exports
+
+When importing as an npm module, you have access to:
+
+### Core Agent
+- `DeckBuilderAgent` - Main agent class
+- `createDeckBuilderAgent()` - Factory function to create and initialize agent
+
+### Agent Tools
+- `createSearchInventoryTool()`
+- `createGetCardInfoTool()`
+- `createValidateDeckTool()`
+- `getAllTools()`
+
+### Integrations
+- `config` - Configuration object
+- `validateConfig()` - Validate configuration
+- `scryfall` - Scryfall API client
+- `createGroqLLM()` - Create Groq LLM instance
+- `GROQ_MODELS` - Available Groq models
+
+### Knowledge Base
+- `commanderRules` - Format rules and ban list
+- `isCardBanned()` - Check if card is banned
+- `getFormattedRules()` - Get formatted rules text
+- `archetypes` - Deck archetypes
+- `getArchetype()` - Get archetype by name
+- `getArchetypesForColors()` - Filter archetypes by colors
+- `deckStructure` - Deck structure guidelines
+- `getStructureForStrategy()` - Get structure for strategy
+- `validateDeckStructure()` - Validate deck structure
+- `staples` - Format staples by color
+- `getStaplesForColors()` - Get staples for color identity
+- `getEssentialStaples()` - Get essential staples
+
+### Utilities
+- `parseColorIdentity()` - Parse color identity
+- `getColorIdentityString()` - Get color identity as string
+- `isValidForCommander()` - Check color identity validity
+- `getColorCombinationName()` - Get color combination name
+- `calculateColorDistribution()` - Calculate color distribution
+- `calculateManaCurve()` - Calculate mana curve
+- `analyzeManaCurve()` - Analyze mana curve with recommendations
+- `generateManaBase()` - Generate mana base recommendations
+- `calculateLandCount()` - Calculate recommended land count
+
+### System Prompt
+- `systemPrompt` - The AI agent's system prompt (for customization)
 
 ## 🎯 Features Deep Dive
 
@@ -187,6 +368,7 @@ The agent follows these guidelines:
 
 ## 🔮 Future Roadmap
 
+- [x] **NPM Module Export**: Import into frontend and API projects
 - [ ] **Web UI**: Browser-based interface
 - [ ] **Discord Bot**: Build decks in Discord servers
 - [ ] **BigDeckAppV3 Integration**: Build decks from your actual collection

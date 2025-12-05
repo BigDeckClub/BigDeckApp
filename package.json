@@ -2,8 +2,19 @@
   "name": "bigdeck-ai",
   "version": "1.0.0",
   "description": "AI-powered Commander deck building agent",
-  "main": "src/index.js",
+  "main": "index.js",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.js"
+    },
+    "./agent": "./src/agent/DeckBuilderAgent.js",
+    "./tools": "./src/agent/tools/index.js",
+    "./integrations": "./src/integrations/config.js",
+    "./knowledge": "./src/knowledge/commanderRules.js",
+    "./utils": "./src/utils/colorIdentity.js"
+  },
   "bin": {
     "bigdeck": "./src/index.js"
   },
@@ -12,6 +23,20 @@
     "chat": "node src/index.js chat",
     "build": "node src/index.js build"
   },
+  "files": [
+    "index.js",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BigDeckClub/BigDeckApp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BigDeckClub/BigDeckApp/issues"
+  },
+  "homepage": "https://github.com/BigDeckClub/BigDeckApp#readme",
   "keywords": [
     "mtg",
     "magic-the-gathering",
@@ -19,10 +44,15 @@
     "edh",
     "ai",
     "deck-builder",
-    "langchain"
+    "langchain",
+    "npm-module",
+    "library"
   ],
   "author": "BigDeckClub",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@langchain/core": "^0.3.0",
     "@langchain/groq": "^0.1.0",

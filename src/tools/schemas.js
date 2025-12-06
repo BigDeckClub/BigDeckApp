@@ -187,10 +187,292 @@ export const analyzeFormatMetaSchema = {
   }
 };
 
+// ============ WRITE TOOL SCHEMAS ============
+
+/**
+ * Add card to inventory
+ */
+export const addCardToInventorySchema = {
+  type: "function",
+  function: {
+    name: "add_card_to_inventory",
+    description: "Add a Magic card to the user's inventory. Looks up card details from Scryfall automatically.",
+    parameters: {
+      type: "object",
+      properties: {
+        cardName: {
+          type: "string",
+          description: "Name of the card to add (e.g., 'Sol Ring', 'Lightning Bolt')"
+        },
+        quantity: {
+          type: "number",
+          description: "Number of copies to add (default: 1)"
+        },
+        folder: {
+          type: "string",
+          description: "Folder/category to put the card in (default: 'Unsorted')"
+        }
+      },
+      required: ["cardName"]
+    }
+  }
+};
+
+/**
+ * Remove card from inventory
+ */
+export const removeCardFromInventorySchema = {
+  type: "function",
+  function: {
+    name: "remove_card_from_inventory",
+    description: "Remove a card from the user's inventory.",
+    parameters: {
+      type: "object",
+      properties: {
+        cardName: {
+          type: "string",
+          description: "Name of the card to remove"
+        },
+        quantity: {
+          type: "number",
+          description: "Number of copies to remove (default: 1)"
+        }
+      },
+      required: ["cardName"]
+    }
+  }
+};
+
+/**
+ * Move card to folder
+ */
+export const moveCardSchema = {
+  type: "function",
+  function: {
+    name: "move_card",
+    description: "Move cards to a different folder/category in the inventory.",
+    parameters: {
+      type: "object",
+      properties: {
+        cardName: {
+          type: "string",
+          description: "Name of the card(s) to move (supports partial matching)"
+        },
+        targetFolder: {
+          type: "string",
+          description: "Destination folder name (e.g., 'Unsorted', 'Commander Staples', 'For Sale')"
+        },
+        quantity: {
+          type: "number",
+          description: "Number of copies to move (omit to move all matching cards)"
+        }
+      },
+      required: ["cardName", "targetFolder"]
+    }
+  }
+};
+
+/**
+ * Search inventory
+ */
+export const searchInventorySchema = {
+  type: "function",
+  function: {
+    name: "search_inventory",
+    description: "Search the user's card inventory by name, type, color, or folder.",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Search query - card name, type, color, or folder. Use 'all' to list entire inventory."
+        }
+      },
+      required: ["query"]
+    }
+  }
+};
+
+/**
+ * Create deck
+ */
+export const createDeckSchema = {
+  type: "function",
+  function: {
+    name: "create_deck",
+    description: "Create a new deck.",
+    parameters: {
+      type: "object",
+      properties: {
+        name: {
+          type: "string",
+          description: "Name for the deck"
+        },
+        commander: {
+          type: "string",
+          description: "Commander card name (for Commander format)"
+        },
+        format: {
+          type: "string",
+          description: "Deck format (default: 'commander')",
+          enum: ["commander", "modern", "standard", "pioneer", "legacy", "vintage", "pauper"]
+        }
+      },
+      required: ["name"]
+    }
+  }
+};
+
+/**
+ * Add card to deck
+ */
+export const addCardToDeckSchema = {
+  type: "function",
+  function: {
+    name: "add_card_to_deck",
+    description: "Add a card to an existing deck.",
+    parameters: {
+      type: "object",
+      properties: {
+        deckName: {
+          type: "string",
+          description: "Name of the deck to add the card to"
+        },
+        cardName: {
+          type: "string",
+          description: "Name of the card to add"
+        },
+        quantity: {
+          type: "number",
+          description: "Number of copies to add (default: 1)"
+        }
+      },
+      required: ["deckName", "cardName"]
+    }
+  }
+};
+
+/**
+ * Remove card from deck
+ */
+export const removeCardFromDeckSchema = {
+  type: "function",
+  function: {
+    name: "remove_card_from_deck",
+    description: "Remove a card from a deck.",
+    parameters: {
+      type: "object",
+      properties: {
+        deckName: {
+          type: "string",
+          description: "Name of the deck"
+        },
+        cardName: {
+          type: "string",
+          description: "Name of the card to remove"
+        },
+        quantity: {
+          type: "number",
+          description: "Number of copies to remove (default: 1)"
+        }
+      },
+      required: ["deckName", "cardName"]
+    }
+  }
+};
+
+/**
+ * Get decks
+ */
+export const getDecksSchema = {
+  type: "function",
+  function: {
+    name: "get_decks",
+    description: "Get the user's saved decks. Use 'all' to list all decks, or provide a deck name for details.",
+    parameters: {
+      type: "object",
+      properties: {
+        deckName: {
+          type: "string",
+          description: "Specific deck name to get details, or 'all' for list"
+        }
+      },
+      required: []
+    }
+  }
+};
+
+/**
+ * Delete deck
+ */
+export const deleteDeckSchema = {
+  type: "function",
+  function: {
+    name: "delete_deck",
+    description: "Delete a saved deck.",
+    parameters: {
+      type: "object",
+      properties: {
+        deckName: {
+          type: "string",
+          description: "Name of the deck to delete"
+        }
+      },
+      required: ["deckName"]
+    }
+  }
+};
+
+/**
+ * Record sale
+ */
+export const recordSaleSchema = {
+  type: "function",
+  function: {
+    name: "record_sale",
+    description: "Record a card sale. This removes the card from inventory and logs the sale.",
+    parameters: {
+      type: "object",
+      properties: {
+        cardName: {
+          type: "string",
+          description: "Name of the card sold"
+        },
+        price: {
+          type: "number",
+          description: "Sale price in dollars"
+        },
+        quantity: {
+          type: "number",
+          description: "Number of copies sold (default: 1)"
+        }
+      },
+      required: ["cardName", "price"]
+    }
+  }
+};
+
+/**
+ * Get sales history
+ */
+export const getSalesSchema = {
+  type: "function",
+  function: {
+    name: "get_sales",
+    description: "Get the user's sales history.",
+    parameters: {
+      type: "object",
+      properties: {},
+      required: []
+    }
+  }
+};
+
 /**
  * All tool schemas as an array for easy consumption
  */
 export const allToolSchemas = [
+  // Read tools
   searchScryfallSchema,
   getCardPriceSchema,
   validateDeckSchema,
@@ -198,13 +480,57 @@ export const allToolSchemas = [
   analyzeMTGGoldfishProfileSchema,
   learnFromYoutubeSchema,
   suggestDeckTechsSchema,
-  analyzeFormatMetaSchema
+  analyzeFormatMetaSchema,
+  // Write tools
+  addCardToInventorySchema,
+  removeCardFromInventorySchema,
+  moveCardSchema,
+  searchInventorySchema,
+  createDeckSchema,
+  addCardToDeckSchema,
+  removeCardFromDeckSchema,
+  getDecksSchema,
+  deleteDeckSchema,
+  recordSaleSchema,
+  getSalesSchema
+];
+
+/**
+ * Read-only tool schemas
+ */
+export const readToolSchemas = [
+  searchScryfallSchema,
+  getCardPriceSchema,
+  validateDeckSchema,
+  analyzeMoxfieldProfileSchema,
+  analyzeMTGGoldfishProfileSchema,
+  learnFromYoutubeSchema,
+  suggestDeckTechsSchema,
+  analyzeFormatMetaSchema,
+  searchInventorySchema,
+  getDecksSchema,
+  getSalesSchema
+];
+
+/**
+ * Write tool schemas
+ */
+export const writeToolSchemas = [
+  addCardToInventorySchema,
+  removeCardFromInventorySchema,
+  moveCardSchema,
+  createDeckSchema,
+  addCardToDeckSchema,
+  removeCardFromDeckSchema,
+  deleteDeckSchema,
+  recordSaleSchema
 ];
 
 /**
  * Export schemas by name for easy lookup
  */
 export const toolSchemasByName = {
+  // Read tools
   search_scryfall: searchScryfallSchema,
   get_card_price: getCardPriceSchema,
   validate_deck: validateDeckSchema,
@@ -212,7 +538,19 @@ export const toolSchemasByName = {
   analyze_mtggoldfish_profile: analyzeMTGGoldfishProfileSchema,
   learn_from_youtube: learnFromYoutubeSchema,
   suggest_deck_techs: suggestDeckTechsSchema,
-  analyze_format_meta: analyzeFormatMetaSchema
+  analyze_format_meta: analyzeFormatMetaSchema,
+  // Write tools
+  add_card_to_inventory: addCardToInventorySchema,
+  remove_card_from_inventory: removeCardFromInventorySchema,
+  move_card: moveCardSchema,
+  search_inventory: searchInventorySchema,
+  create_deck: createDeckSchema,
+  add_card_to_deck: addCardToDeckSchema,
+  remove_card_from_deck: removeCardFromDeckSchema,
+  get_decks: getDecksSchema,
+  delete_deck: deleteDeckSchema,
+  record_sale: recordSaleSchema,
+  get_sales: getSalesSchema
 };
 
 export default allToolSchemas;

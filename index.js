@@ -82,6 +82,8 @@ export {
 // Tool Schemas (OpenAI function calling)
 export {
   allToolSchemas,
+  readToolSchemas,
+  writeToolSchemas,
   toolSchemasByName,
   searchScryfallSchema,
   getCardPriceSchema,
@@ -90,8 +92,40 @@ export {
   analyzeMTGGoldfishProfileSchema,
   learnFromYoutubeSchema,
   suggestDeckTechsSchema,
-  analyzeFormatMetaSchema
+  analyzeFormatMetaSchema,
+  // Write tool schemas
+  addCardToInventorySchema,
+  removeCardFromInventorySchema,
+  moveCardSchema,
+  searchInventorySchema,
+  createDeckSchema,
+  addCardToDeckSchema,
+  removeCardFromDeckSchema,
+  getDecksSchema,
+  deleteDeckSchema,
+  recordSaleSchema,
+  getSalesSchema
 } from './src/tools/schemas.js';
+
+// Tool Handlers (implementations)
+export {
+  toolHandlers,
+  executeTool,
+  addCardToInventory,
+  removeCardFromInventory,
+  moveCard,
+  searchInventory,
+  createDeck,
+  addCardToDeck,
+  removeCardFromDeck,
+  getDecks,
+  deleteDeck,
+  recordSale,
+  getSales
+} from './src/tools/handlers.js';
+
+// Data Store
+export { store } from './src/data/store.js';
 
 // Integrations
 export { 

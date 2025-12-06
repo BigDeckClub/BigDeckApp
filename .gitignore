@@ -48,3 +48,9 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# Test files
+verify-exports.js
+test-functionality.js
+examples-usage.js
+test-scryfall-validation.js

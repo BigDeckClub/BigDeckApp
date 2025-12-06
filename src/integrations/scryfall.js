@@ -203,7 +203,11 @@ export const scryfall = new ScryfallAPI();
 export async function searchScryfall(query, options = {}) {
   try {
     const results = await scryfall.searchCards(query, options);
-    return results.data || [];
+    // Safely access data property with validation
+    if (results && typeof results === 'object' && Array.isArray(results.data)) {
+      return results.data;
+    }
+    return [];
   } catch (error) {
     console.error('Scryfall search failed:', error.message);
     return [];

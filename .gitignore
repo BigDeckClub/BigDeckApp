@@ -53,3 +53,4 @@ temp/
 verify-exports.js
 test-functionality.js
 examples-usage.js
+test-scryfall-validation.js
